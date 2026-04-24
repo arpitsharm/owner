@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shipping Label - Order #{{ order.order_number }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        @page {
+            size: landscape;
+            margin: 10mm;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f0f0f0;
+            padding: 20px;
+        }
+        
+        .shipping-label {
+            width: 297mm;
+            height: 210mm;
+            background: white;
+            padding: 20px;
+            margin: 0 auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-rows: auto auto 1fr auto;
+            gap: 15px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 4px solid #00BAF2;
+            padding-bottom: 15px;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #00BAF2;
+        }
+        
+        .tagline {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .order-badge {
+            background: #00BAF2;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .order-badge .label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        .order-badge .number {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .section {
+            border: 3px solid #333;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .section-header {
+            background: #00BAF2;
+            color: white;
+            padding: 10px;
+            margin: -20px -20px 15px -20px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 5px 5px 0 0;
+        }
+        
+        .address-content {
+            font-size: 20px;
+            line-height: 1.8;
+        }
+        
+        .address-content .name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #00BAF2;
+        }
+        
+        .barcode-section {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .barcode {
+            font-size: 48px;
+            letter-spacing: 5px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .barcode-number {
+            font-size: 28px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 3px;
+            background: #f8f9fa;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+        
+        .order-date {
+            font-size: 16px;
+            margin-top: 10px;
+            color: #666;
+        }
+        
+        .items-list {
+            font-size: 16px;
+        }
+        
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 2px dotted #ddd;
+        }
+        
+        .item-row:last-child {
+            border-bottom: none;
+        }
+        
+        .item-number {
+            width: 30px;
+            font-weight: bold;
+            color: #00BAF2;
+        }
+        
+        .item-name {
+            flex: 2;
+            font-weight: 500;
+        }
+        
+        .item-qty {
+            flex: 1;
+            text-align: center;
+            font-weight: bold;
+            background: #f8f9fa;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        
+        .footer-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .total-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border: 3px solid #00BAF2;
+            border-radius: 8px;
+        }
+        
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+            padding: 8px 0;
+        }
+        
+        .grand-total {
+            font-size: 32px;
+            font-weight: bold;
+            color: #00BAF2;
+            border-top: 3px solid #00BAF2;
+            padding-top: 15px;
+            margin-top: 10px;
+        }
+        
+        .thankyou-box {
+            background: #00BAF2;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .thankyou-box h2 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        .thankyou-box p {
+            font-size: 18px;
+            margin: 5px 0;
+        }
+        
+        .website {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .print-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #00BAF2;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        
+        .print-button:hover {
+            background: #0099c9;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .shipping-label {
+                box-shadow: none;
+                margin: 0;
+                width: 100%;
+                height: 100vh;
+            }
+            
+            .print-button {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="print-button" onclick="window.print()">
+        🖨️ Print Shipping Label
+    </button>
+    
+    <div class="shipping-label">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo-section">
+                <div>
+                    <div class="logo">🛍️ TheDiora</div>
+                    <div class="tagline">Premium Home Decor & Furniture</div>
+                </div>
+            </div>
+            <div class="order-badge">
+                <div class="label">ORDER NUMBER</div>
+                <div class="number">#{{ order.order_number }}</div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Shipping Address -->
+            <div class="section">
+                <div class="section-header">📍 Ship To</div>
+                <div class="address-content">
+                    <div class="name">{{ order.shipping_first_name }} {{ order.shipping_last_name }}</div>
+                    <div>{{ order.shipping_address_line1 }}</div>
+                    {% if order.shipping_address_line2 %}
+                    <div>{{ order.shipping_address_line2 }}</div>
+                    {% endif %}
+                    <div>{{ order.shipping_city }}, {{ order.shipping_state }}</div>
+                    <div>{{ order.shipping_zipcode }}</div>
+                    <div style="margin-top: 15px; font-size: 18px;"><strong>📞</strong> {{ order.shipping_phone }}</div>
+                </div>
+            </div>
+            
+            <!-- Barcode -->
+            <div class="section barcode-section">
+                <div class="section-header">📦 Order Barcode</div>
+                <div class="barcode">||||||||||||||||||||</div>
+                <div class="barcode-number">{{ order.order_number }}</div>
+                <div class="order-date">
+                    <strong>Date:</strong> {{ order.created_at|date:"d-M-Y" }}<br>
+                    <strong>Payment:</strong> {{ order.get_payment_method_display }}
+                </div>
+            </div>
+            
+            <!-- Items -->
+            <div class="section">
+                <div class="section-header">🛒 Items ({{ order_items.count }})</div>
+                <div class="items-list">
+                    {% for item in order_items %}
+                    <div class="item-row">
+                        <div class="item-number">{{ forloop.counter }}.</div>
+                        <div class="item-name">{{ item.product.name|truncatechars:30 }}</div>
+                        <div class="item-qty">x{{ item.quantity }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer Section -->
+        <div class="footer-section">
+            <div class="total-box">
+                <div class="total-row">
+                    <span>Subtotal:</span>
+                    <span>₹{{ order.total_amount|add:order.discount_amount|floatformat:0 }}</span>
+                </div>
+                {% if order.discount_amount > 0 %}
+                <div class="total-row" style="color: #28a745;">
+                    <span>Discount:</span>
+                    <span>-₹{{ order.discount_amount|floatformat:0 }}</span>
+                </div>
+                {% endif %}
+                <div class="total-row grand-total">
+                    <span>Total Amount:</span>
+                    <span>₹{{ order.total_amount|floatformat:0 }}</span>
+                </div>
+            </div>
+            
+            <div class="thankyou-box">
+                <h2>🙏 Thank You!</h2>
+                <p>We appreciate your business</p>
+                <div class="website">www.thediora.com</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Auto-print when page loads (optional - uncomment if needed)
+        // window.onload = function() { window.print(); }
+    </script>
+</body>
+</html>

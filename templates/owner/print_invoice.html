@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice - Order #{{ order.order_number }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .invoice-container {
+            max-width: 210mm;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 4px solid #00BAF2;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .company-info {
+            flex: 1;
+        }
+        
+        .company-name {
+            font-size: 36px;
+            font-weight: bold;
+            color: #00BAF2;
+            margin-bottom: 5px;
+        }
+        
+        .company-tagline {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .invoice-title {
+            text-align: right;
+        }
+        
+        .invoice-title h1 {
+            font-size: 42px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .invoice-number {
+            font-size: 18px;
+            color: #00BAF2;
+            font-weight: bold;
+        }
+        
+        .info-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .info-box {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #00BAF2;
+        }
+        
+        .info-box h3 {
+            color: #00BAF2;
+            font-size: 16px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .info-box p {
+            font-size: 14px;
+            margin: 5px 0;
+            line-height: 1.6;
+        }
+        
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+        }
+        
+        .items-table thead {
+            background: #00BAF2;
+            color: white;
+        }
+        
+        .items-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .items-table th:last-child {
+            text-align: right;
+        }
+        
+        .items-table td {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+        
+        .items-table td:last-child {
+            text-align: right;
+            font-weight: bold;
+        }
+        
+        .items-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .summary-section {
+            margin-top: 30px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .summary-box {
+            width: 350px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 16px;
+        }
+        
+        .summary-row.discount {
+            color: #28a745;
+        }
+        
+        .grand-total {
+            font-size: 28px;
+            font-weight: bold;
+            color: #00BAF2;
+            border-top: 3px solid #00BAF2;
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+        
+        .payment-info {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .payment-info h3 {
+            color: #00BAF2;
+            margin-bottom: 10px;
+        }
+        
+        .payment-info p {
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        
+        .footer {
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 2px solid #00BAF2;
+            text-align: center;
+        }
+        
+        .thank-you {
+            font-size: 32px;
+            font-weight: bold;
+            color: #00BAF2;
+            margin-bottom: 10px;
+        }
+        
+        .footer-message {
+            font-size: 16px;
+            color: #666;
+            margin: 10px 0;
+        }
+        
+        .website {
+            font-size: 20px;
+            font-weight: bold;
+            color: #00BAF2;
+            margin-top: 15px;
+        }
+        
+        .print-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #00BAF2;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        
+        .print-button:hover {
+            background: #0099c9;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .invoice-container {
+                box-shadow: none;
+                padding: 20px;
+            }
+            
+            .print-button {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="print-button" onclick="window.print()">
+        🖨️ Print Invoice
+    </button>
+    
+    <div class="invoice-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="company-info">
+                <div class="company-name">🛍️ TheDiora</div>
+                <div class="company-tagline">Premium Home Decor & Furniture</div>
+            </div>
+            <div class="invoice-title">
+                <h1>INVOICE</h1>
+                <div class="invoice-number">#{{ order.order_number }}</div>
+            </div>
+        </div>
+        
+        <!-- Customer & Order Info -->
+        <div class="info-section">
+            <div class="info-box">
+                <h3>📋 Bill To</h3>
+                <p><strong>{{ order.shipping_first_name }} {{ order.shipping_last_name }}</strong></p>
+                <p>{{ order.shipping_address_line1 }}</p>
+                {% if order.shipping_address_line2 %}
+                <p>{{ order.shipping_address_line2 }}</p>
+                {% endif %}
+                <p>{{ order.shipping_city }}, {{ order.shipping_state }} {{ order.shipping_zipcode }}</p>
+                <p style="margin-top: 10px;"><strong>📞</strong> {{ order.shipping_phone }}</p>
+                <p><strong>📧</strong> {{ order.shipping_email }}</p>
+            </div>
+            
+            <div class="info-box">
+                <h3>📦 Order Details</h3>
+                <p><strong>Order ID:</strong> {{ order.order_number }}</p>
+                <p><strong>Order Date:</strong> {{ order.created_at|date:"F d, Y" }}</p>
+                <p><strong>Payment Method:</strong> {{ order.get_payment_method_display }}</p>
+                <p><strong>Order Status:</strong> {{ order.get_status_display|title }}</p>
+            </div>
+        </div>
+        
+        <!-- Items Table -->
+        <h2 style="margin-bottom: 15px; color: #333;">Order Items</h2>
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Product Name</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order_items %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td><strong>{{ item.product.name }}</strong></td>
+                    <td>{{ item.quantity }}</td>
+                    <td>₹{{ item.price|floatformat:2 }}</td>
+                    <td>₹{{ item.get_total|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <!-- Summary -->
+        <div class="summary-section">
+            <div class="summary-box">
+                <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span>₹{{ order.total_amount|add:order.discount_amount|floatformat:2 }}</span>
+                </div>
+                {% if order.discount_amount > 0 %}
+                <div class="summary-row discount">
+                    <span>Discount Applied:</span>
+                    <span>-₹{{ order.discount_amount|floatformat:2 }}</span>
+                </div>
+                {% endif %}
+                <div class="summary-row grand-total">
+                    <span>Grand Total:</span>
+                    <span>₹{{ order.total_amount|floatformat:2 }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Payment Information -->
+        <div class="payment-info">
+            <h3>💳 Payment Information</h3>
+            <p><strong>Payment Method:</strong> {{ order.get_payment_method_display }}</p>
+            <p><strong>Payment Status:</strong> {% if order.payment_status == 'completed' %}✅ Paid{% else %}⏳ Pending{% endif %}</p>
+            {% if order.transaction_id %}
+            <p><strong>Transaction ID:</strong> {{ order.transaction_id }}</p>
+            {% endif %}
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <div class="thank-you">🙏 Thank You for Your Purchase!</div>
+            <p class="footer-message">We appreciate your business and hope you enjoy your purchase.</p>
+            <p class="footer-message">For any queries, please contact our customer support.</p>
+            <div class="website">🌐 www.thediora.com</div>
+        </div>
+    </div>
+    
+    <script>
+        // Auto-print when page loads (optional - uncomment if needed)
+        // window.onload = function() { window.print(); }
+    </script>
+</body>
+</html>
